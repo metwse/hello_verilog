@@ -1,6 +1,3 @@
-`timescale 1ns / 1ps
-
-
 // rotate
 `define ROTL_VAL(a, b) ((a << b) | (a >> (32 - b)))
 
@@ -15,16 +12,18 @@
 module chacha20_block(
     input wire clk,
     input wire start,
-    input wire [31:0] state_in [0:15],
-    output reg done,
-    output reg [31:0] state_out [0:15]
+    input wire [31:0] state_in [16],
+    output wire done,
+    output reg [31:0] state_out [16]
     );
 
-    reg [31:0] x [0:15];
-    reg [31:0] initial_state [0:15];
-    reg [3:0] round_counter;
+    reg [31:0] x [16];
+    reg [31:0] initial_state [16];
+    reg [3:0] round_counter = 0;
 
-    integer k;
+    int k;
+
+    assign done = round_counter == 12;
 
     always @(posedge clk) begin
         if (start) begin
@@ -32,6 +31,7 @@ module chacha20_block(
                 x[k] <= state_in[k];
                 initial_state[k] <= state_in[k];
             end
+
             round_counter = 1;
         end else if (round_counter > 0 && round_counter < 11) begin
             // odd round
@@ -49,10 +49,9 @@ module chacha20_block(
             round_counter++;
         end else if (round_counter == 11) begin
             for (k = 0; k < 16; k++)
-                state_out[k] = initial_state[k] + x[k];
+                state_out[k] <= initial_state[k] + x[k];
 
-            done = 1;
-            round_counter = 0;
+            round_counter++;
         end
     end
 

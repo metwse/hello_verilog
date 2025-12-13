@@ -6,14 +6,17 @@ module chacha20_tester(
 
     reg clk;
     reg start;
-    reg [31:0] state_in [0:15];
+    reg [31:0] state_in [16];
 
     wire done;
-    wire [31:0] state_out [0:15];
+    wire [31:0] state_out [16];
 
-    integer k;
+    int k;
 
-    chacha20_block uut1 (clk, start, state_in, done, state_out);
+    chacha20_block uut1 (
+        .clk(clk), .start(start), .state_in(state_in),
+        .done(done), .state_out(state_out)
+    );
 
     initial clk = 0;
     always #5 clk = ~clk;
