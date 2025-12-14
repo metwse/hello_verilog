@@ -3,7 +3,7 @@ module uart_tx
     (
     input wire clk,
     output wire serial_tx,
-    input wire [6:0] to_sent,
+    input wire [7:0] to_sent,
     input wire flush,
     output wire busy
     );
@@ -14,20 +14,20 @@ module uart_tx
     localparam int StopBit = 3;
 
     reg [7:0] uart_clk = 0;
-    reg [6:0] outgoing_bits;
+    reg [7:0] outgoing_bits;
     reg [2:0] state = Idle;
-    reg [2:0] sent = 7;
+    reg [2:0] sent = 0;
 
     assign busy = state != Idle;
     assign serial_tx = state == DataBits ?
-                                    outgoing_bits[6 - sent] :
+                                    outgoing_bits[7 - sent] :
                                     (state == Idle ? 1 : 0);
 
     always @(posedge clk) begin
         if (state == Idle) begin
             if (flush) begin
                 uart_clk = 0;
-                sent = 6;
+                sent = 7;
                 outgoing_bits = to_sent;
                 state = StartBit;
             end

@@ -3,7 +3,7 @@ module uart_rx
     (
     input wire clk,
     input wire serial_rx,
-    output reg [6:0] received,
+    output reg [7:0] received,
     output wire ready
     );
 
@@ -42,7 +42,7 @@ module uart_rx
             begin
                 received[collected] = serial_rx;
                 collected++;
-                if (collected == 7)
+                if (collected == 0)
                     state = StopBit;
             end
                 StopBit:
