@@ -3,7 +3,7 @@ module uart_rx
     (
     input wire clk,
     input wire serial_rx,
-    output reg [7:0] received,
+    output reg [7:0] incoming,
     output wire ready
     );
 
@@ -30,14 +30,14 @@ module uart_rx
             unique case (state)
                 StartBit:
             begin
-                received <= 0;
+                incoming <= 0;
                 collected <= 0;
 
                 state = DataBits;
             end
                 DataBits:
             begin
-                received[collected] = serial_rx;
+                incoming[collected] = serial_rx;
                 collected++;
                 if (collected == 0)
                     state = Ready;
