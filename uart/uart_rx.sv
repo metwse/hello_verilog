@@ -10,14 +10,13 @@ module uart_rx
     localparam int Idle = 0;
     localparam int StartBit = 1;
     localparam int DataBits = 2;
-    localparam int StopBit = 3;
-    localparam int ClockComplete = 4;
+    localparam int Ready = 3;
 
-    reg [7:0] uart_clk = 0;
+    reg [15:0] uart_clk = 0;
     reg [3:0] state = 0;
     reg [2:0] collected = 0;
 
-    assign ready = state == StopBit;
+    assign ready = state == Ready && uart_clk == CLKS_PER_BIT - 1;
 
     always @(posedge clk) begin
         if (state == Idle) begin
@@ -25,9 +24,7 @@ module uart_rx
                 uart_clk = 0;
                 state = StartBit;
             end
-        end else if (uart_clk < CLKS_PER_BIT / 4)
-            uart_clk++;
-        else if (uart_clk == CLKS_PER_BIT / 2) begin
+        end else if (uart_clk == CLKS_PER_BIT / 2) begin
             uart_clk++;
 
             unique case (state)
@@ -43,22 +40,17 @@ module uart_rx
                 received[collected] = serial_rx;
                 collected++;
                 if (collected == 0)
-                    state = StopBit;
-            end
-                StopBit:
-            begin
-                state = ClockComplete;
-                collected = 0;
+                    state = Ready;
             end
             endcase
         end else begin
             uart_clk++;
 
-            if (uart_clk > CLKS_PER_BIT) begin
-                uart_clk = 0;
+            if (uart_clk == CLKS_PER_BIT) begin
+                uart_clk <= 0;
 
-                if (state == ClockComplete)
-                    state = Idle;
+                if (state == Ready)
+                    state <= Idle;
             end
         end
     end

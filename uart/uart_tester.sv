@@ -4,20 +4,20 @@
 module uart_tester(
     );
 
-    parameter int CLK_PERIOD_NS = 83.33;
-    parameter int BAUD = 115200;
-    parameter int BAUD_LENGTH = 1000000000 / BAUD;
-    parameter int CLKS_PER_BIT = BAUD_LENGTH / CLK_PERIOD_NS;
+    localparam real ClkPeriodNs = 83.33;
+    localparam real Baud = 4800;
+    localparam real BaudLength = 1000000000 / Baud;
+    localparam int ClksPerBit = BaudLength / ClkPeriodNs;
 
     reg clk;
 
     initial clk = 0;
-    always #(CLK_PERIOD_NS / 2.0) clk = ~clk;
+    always #(ClkPeriodNs / 2.0) clk = ~clk;
 
     wire [7:0] received;
     wire rx_ready;
 
-    uart_rx #(.CLKS_PER_BIT(CLKS_PER_BIT)) uut_rx (
+    uart_rx #(.CLKS_PER_BIT(ClksPerBit)) uut_rx (
         .clk(clk),
         .serial_rx(serial_tx),
         .received(received),
@@ -30,7 +30,7 @@ module uart_tester(
     reg flush;
     wire busy;
 
-    uart_tx #(.CLKS_PER_BIT(CLKS_PER_BIT)) uut_tx (
+    uart_tx #(.CLKS_PER_BIT(ClksPerBit)) uut_tx (
         .clk(clk),
         .serial_tx(serial_tx),
         .to_sent(to_sent),
@@ -40,12 +40,12 @@ module uart_tester(
 
     initial begin
         to_sent = 213;
-        #(CLK_PERIOD_NS * 5) flush = 1;
-        #(CLK_PERIOD_NS) flush = 0;
+        #(ClkPeriodNs * 5) flush = 1;
+        #(ClkPeriodNs) flush = 0;
     end
 
     always @(negedge busy) begin
-        #(CLK_PERIOD_NS) flush = 1;
-        #(CLK_PERIOD_NS) flush = 0;
+        #(ClkPeriodNs) flush = 1;
+        #(ClkPeriodNs) flush = 0;
     end
 endmodule

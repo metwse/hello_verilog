@@ -11,9 +11,8 @@ module uart_tx
     localparam int Idle = 0;
     localparam int StartBit = 1;
     localparam int DataBits = 2;
-    localparam int StopBit = 3;
 
-    reg [7:0] uart_clk = 0;
+    reg [15:0] uart_clk = 0;
     reg [7:0] outgoing_bits;
     reg [2:0] state = Idle;
     reg [2:0] sent = 0;
@@ -26,31 +25,27 @@ module uart_tx
     always @(posedge clk) begin
         if (state == Idle) begin
             if (flush) begin
-                uart_clk = 0;
-                sent = 7;
-                outgoing_bits = to_sent;
-                state = StartBit;
+                uart_clk <= 0;
+                sent <= 7;
+                outgoing_bits <= to_sent;
+                state <= StartBit;
             end
         end else if (flush == 0) begin
             uart_clk++;
 
             if (uart_clk == CLKS_PER_BIT) begin
-                uart_clk = 0;
+                uart_clk <= 0;
 
                 unique case (state)
                     StartBit:
                 begin
-                    state = DataBits;
+                    state <= DataBits;
                 end
                     DataBits:
                 begin
                     sent--;
                     if (sent == 7)
-                        state = StopBit;
-                end
-                    StopBit:
-                begin
-                    state = Idle;
+                        state <= Idle;
                 end
                 endcase
             end
