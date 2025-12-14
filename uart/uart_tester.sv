@@ -5,7 +5,7 @@ module uart_tester(
     );
 
     localparam real ClkPeriodNs = 83.33;
-    localparam real Baud = 4800;
+    localparam real Baud = 9600;
     localparam real BaudLength = 1000000000 / Baud;
     localparam int ClksPerBit = BaudLength / ClkPeriodNs;
 
