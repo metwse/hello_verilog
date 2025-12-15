@@ -24,7 +24,7 @@ module chacha20_tester(
     initial begin
         start = 0;
 
-        $readmemh("state_in.dat", state_in);
+        $readmemh("chacha20_state_in.dat", state_in);
 
         #10 start = 1;
         #10 start = 0;

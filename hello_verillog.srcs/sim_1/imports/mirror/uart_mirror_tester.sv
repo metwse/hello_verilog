@@ -6,20 +6,16 @@ module uart_mirror_tester(
 
     localparam int Baud = 921600;
 
-    localparam real SysclkPeriodNs = 83.3333;
     localparam real Clk72MhzPeriodNs = 13.8888;
 
     localparam real BaudLength = 1000000000.00 / Baud;
     localparam int ClksPerBit = BaudLength / Clk72MhzPeriodNs;
 
 
-    reg sysclk = 0;
     reg clk_72mhz = 0;
     reg clk_72mhz_locked = 0;
     wire serial_rx;
     wire serial_tx_cloned;
-
-    always #(SysclkPeriodNs / 2.0) sysclk = ~sysclk;
 
     always #(Clk72MhzPeriodNs / 2.0) clk_72mhz = ~clk_72mhz;
 
@@ -46,7 +42,7 @@ module uart_mirror_tester(
     end
 
     initial begin
-        #(SysclkPeriodNs * 2) clk_72mhz_locked = 1;
+        #(Clk72MhzPeriodNs * 24) clk_72mhz_locked = 1;
     end
 
 endmodule

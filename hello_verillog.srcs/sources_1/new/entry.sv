@@ -12,7 +12,7 @@ module entry(
 
     wire clk;
 
-    clk_wiz_0 u_clk_72mhz (
+    clk_12mhz_to_72mhz u_clk_12mhz_to_72mhz (
         .clk_in1(sysclk),
         .clk_out1(clk),
         .locked()
